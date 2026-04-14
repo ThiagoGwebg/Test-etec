@@ -1,0 +1,54 @@
+// Recupera os eventos do armazenamento local
+let eventos = getData("eventos");
+
+function render() {
+    const lista = document.getElementById('lista');
+    lista.innerHTML = "";
+
+    eventos.forEach((e, i) => {
+        // Pequeno truque para mostrar a data no formato Dia/Mês/Ano
+        let dataFormatada = "";
+        if (e.data) {
+            dataFormatada = e.data.split('-').reverse().join('/');
+        }
+
+        lista.innerHTML += `
+            <div class="item-lista">
+                <p><strong>Evento:</strong> ${e.titulo}</p>
+                <p><strong>Data:</strong> ${dataFormatada}</p>
+                <button onclick="remover(${i})" class="btn-remover">Remover Evento</button>
+            </div>
+        `;
+    });
+};
+
+function remover(i) {
+    eventos.splice(i, 1);
+    saveData("eventos", eventos);
+    render();
+};
+
+document.getElementById("form").addEventListener("submit", e => {
+    e.preventDefault(); // Evita que a página recarregue
+
+    const titulo = document.getElementById("titulo").value;
+    const data = document.getElementById("data").value;
+
+    eventos.push({ titulo, data });
+    saveData("eventos", eventos);
+
+    e.target.reset(); // Limpa os campos do formulário
+    render();
+});
+
+// Executa o render logo que a página carrega
+render();
+
+// Funções de manipulação do LocalStorage (idênticas às dos utilizadores)
+function getData(key) {
+    return JSON.parse(localStorage.getItem(key)) || [];
+};
+
+function saveData(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+};
